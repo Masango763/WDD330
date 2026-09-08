@@ -1,4 +1,4 @@
-import { loadHeaderFooter } from './utils.mjs';
+import { loadHeaderFooter } from "./utils.mjs";
 
 loadHeaderFooter();
-console.log('Sleep Outside main script initialized successfully.');
+console.log("Sleep Outside main script initialized successfully.");
