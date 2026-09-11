@@ -20,7 +20,7 @@ function renderCartContents() {
 
   if (!cartItems || cartItems.length === 0) {
     element.innerHTML =
-      '<li class="cart-empty"><p>Your cart is currently empty.</p></li>';
+      "<li class=\"cart-empty\"><p>Your cart is currently empty.</p></li>";
     return;
   }
 
