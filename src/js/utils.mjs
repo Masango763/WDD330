@@ -1,38 +1,48 @@
-// Retrieve a parameter value from the current URL query string
-export function getParam(param) {
-  const queryString = window.location.search;
-  const urlParams = new URLSearchParams(queryString);
-  return urlParams.get(param);
-}
-
-// LocalStorage helper functions
-export function setLocalStorage(key, data) {
-  localStorage.setItem(key, JSON.stringify(data));
+export function qs(selector, parent = document) {
+  return parent.querySelector(selector);
 }
 
 export function getLocalStorage(key) {
   return JSON.parse(localStorage.getItem(key));
 }
 
-// Helper to load template HTML files via fetch
+export function setLocalStorage(key, data) {
+  localStorage.setItem(key, JSON.stringify(data));
+}
+
+export function getParam(param) {
+  const queryString = window.location.search;
+  const urlParams = new URLSearchParams(queryString);
+  return urlParams.get(param);
+}
+
+export function renderListWithTemplate(templateFn, parentElement, list, position = "afterbegin", clear = true) {
+  if (clear) {
+    parentElement.innerHTML = "";
+  }
+  const htmlStrings = list.map(templateFn);
+  parentElement.insertAdjacentHTML(position, htmlStrings.join(""));
+}
+
+export function renderWithTemplate(template, parentElement, data, callback) {
+  parentElement.innerHTML = template;
+  if (callback) {
+    callback(data);
+  }
+}
+
 export async function loadTemplate(path) {
   const res = await fetch(path);
   const template = await res.text();
   return template;
 }
 
-// Dynamically load header and footer into designated placeholders
 export async function loadHeaderFooter() {
-  const headerTemplate = await loadTemplate('../public/partials/header.html');
-  const footerTemplate = await loadTemplate('../public/partials/footer.html');
+  const headerTemplate = await loadTemplate("/partials/header.html");
+  const headerElement = document.querySelector("#main-header");
+  const footerTemplate = await loadTemplate("/partials/footer.html");
+  const footerElement = document.querySelector("#main-footer");
 
-  const headerElement = document.querySelector('#main-header');
-  const footerElement = document.querySelector('#main-footer');
-
-  if (headerElement) {
-    headerElement.innerHTML = headerTemplate;
-  }
-  if (footerElement) {
-    footerElement.innerHTML = footerTemplate;
-  }
+  renderWithTemplate(headerTemplate, headerElement);
+  renderWithTemplate(footerTemplate, footerElement);
 }
