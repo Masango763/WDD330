@@ -10,8 +10,3 @@ const listElement = document.querySelector('.product-list');
 const myList = new ProductList(category, dataSource, listElement);
 
 myList.init();
-
-const titleCategory = document.querySelector('.title-category');
-if (titleCategory && category) {
-  titleCategory.textContent = category.charAt(0).toUpperCase() + category.slice(1).replace('-', ' ');
-}
