@@ -21,17 +21,27 @@ export default class ShoppingCart {
   }
 
   async init() {
-    const list = getLocalStorage(this.key) || [];
-    this.renderCartContents(list);
+    const list = getLocalStorage(this.key);
+    // Ensure list is a valid non-empty array
+    const validList = Array.isArray(list) ? list : [];
+    this.renderCartContents(validList);
   }
 
   renderCartContents(cartItems) {
     const element = document.querySelector(this.parentSelector);
-    if (element) {
-      if (cartItems.length === 0) {
-        element.innerHTML = "<p>Your cart is currently empty.</p>";
-      } else {
-        renderListWithTemplate(cartItemTemplate, element, cartItems, "afterbegin", true);
+    const totalElement = document.querySelector(".cart-footer");
+
+    if (!element) return;
+
+    if (!cartItems || cartItems.length === 0) {
+      element.innerHTML = "<p class='empty-cart-message'>Your cart is currently empty.</p>";
+      if (totalElement) {
+        totalElement.classList.add("hide");
+      }
+    } else {
+      renderListWithTemplate(cartItemTemplate, element, cartItems, "afterbegin", true);
+      if (totalElement) {
+        totalElement.classList.remove("hide");
       }
     }
   }
