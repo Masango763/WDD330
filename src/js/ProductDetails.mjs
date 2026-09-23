@@ -1,18 +1,4 @@
-import { getLocalStorage, setLocalStorage } from './utils.mjs';
-
-function productDetailsTemplate(product) {
-  return `<section class="product-detail">
-    <h3>${product.Brand.Name}</h3>
-    <h2 class="divider">${product.NameWithoutBrand}</h2>
-    <img class="divider" src="${product.Images.PrimaryLarge}" alt="${product.Name}" />
-    <p class="product-card__price">$${product.FinalPrice}</p>
-    <p class="product__color">${product.Colors[0].ColorName}</p>
-    <p class="product__description">${product.DescriptionHtmlSimple}</p>
-    <div class="product-detail__add">
-      <button id="addToCart" data-id="${product.Id}">Add to Cart</button>
-    </div>
-  </section>`;
-}
+import { getLocalStorage, setLocalStorage, alertMessage } from "./utils.mjs";
 
 export default class ProductDetails {
   constructor(productId, dataSource) {
@@ -23,18 +9,41 @@ export default class ProductDetails {
 
   async init() {
     this.product = await this.dataSource.findProductById(this.productId);
-    this.renderProductDetails('main');
-    document.getElementById('addToCart').addEventListener('click', this.addToCart.bind(this));
+    this.renderProductDetails("main");
+    document
+      .getElementById("addToCart")
+      .addEventListener("click", this.addToCart.bind(this));
   }
 
   addToCart() {
-    let cart = getLocalStorage('so-cart') || [];
+    let cart = getLocalStorage("so-cart") || [];
     cart.push(this.product);
-    setLocalStorage('so-cart', cart);
+    setLocalStorage("so-cart", cart);
+    alertMessage(`${this.product.NameWithoutBrand} added to cart!`, false);
   }
 
   renderProductDetails(selector) {
     const element = document.querySelector(selector);
-    element.insertAdjacentHTML('afterbegin', productDetailsTemplate(this.product));
+    if (element) {
+      element.innerHTML = productDetailsTemplate(this.product);
+    }
   }
+}
+
+function productDetailsTemplate(product) {
+  return `<section class="product-detail">
+    <h3>${product.Brand?.Name || ''}</h3>
+    <h2 class="divider">${product.NameWithoutBrand}</h2>
+    <img
+      class="divider"
+      src="${product.Images?.PrimaryLarge || product.Image}"
+      alt="${product.NameWithoutBrand}"
+    />
+    <p class="product-card__price">$${product.FinalPrice}</p>
+    <p class="product__color">${product.Colors?.[0]?.ColorName || ''}</p>
+    <p class="product__description__htmlformat">${product.DescriptionHtmlSimple}</p>
+    <div class="product-detail__add">
+      <button id="addToCart" data-id="${product.Id}">Add to Cart</button>
+    </div>
+  </section>`;
 }
