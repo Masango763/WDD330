@@ -1,45 +1,52 @@
-export function getParam(param) {
-  const queryString = window.location.search;
-  const urlParams = new URLSearchParams(queryString);
-  return urlParams.get(param);
-}
-
-export function renderListWithTemplate(templateFn, parentElement, list, position = "afterbegin", clear = false) {
-  if (clear) parentElement.innerHTML = "";
-  const htmlStrings = list.map(templateFn);
-  parentElement.insertAdjacentHTML(position, htmlStrings.join(""));
-}
-
-export function renderWithTemplate(template, parentElement, data, callback) {
-  parentElement.innerHTML = template;
-  if (callback) {
-    callback(data);
-  }
-}
-
-export async function loadTemplate(path) {
-  const res = await fetch(path);
-  if (res.ok) {
-    return await res.text();
-  }
-  throw new Error(`Failed to load template from ${path}`);
-}
-
-export async function loadHeaderFooter() {
-  const headerTemplate = await loadTemplate("/partials/header.html");
-  const footerTemplate = await loadTemplate("/partials/footer.html");
-
-  const headerElement = document.querySelector("#main-header");
-  const footerElement = document.querySelector("#main-footer");
-
-  if (headerElement) renderWithTemplate(headerTemplate, headerElement);
-  if (footerElement) renderWithTemplate(footerTemplate, footerElement);
-}
-
 export function getLocalStorage(key) {
   return JSON.parse(localStorage.getItem(key));
 }
 
 export function setLocalStorage(key, data) {
   localStorage.setItem(key, JSON.stringify(data));
+}
+
+export function alertMessage(message, scroll = true) {
+  const alert = document.createElement("div");
+  alert.classList.add("alert");
+  alert.innerHTML = `<p>${message}</p><span>X</span>`;
+
+  alert.addEventListener("click", function (e) {
+    if (e.target.tagName === "SPAN") {
+      const main = document.querySelector("main");
+      if (main && main.contains(this)) {
+        main.removeChild(this);
+      }
+    }
+  });
+
+  const main = document.querySelector("main");
+  if (main) {
+    main.prepend(alert);
+  }
+  if (scroll) {
+    window.scrollTo(0, 0);
+  }
+}
+
+export function removeAllAlerts() {
+  const alerts = document.querySelectorAll(".alert");
+  alerts.forEach((alert) => alert.remove());
+}
+
+export async function loadTemplate(path) {
+  const res = await fetch(path);
+  const template = await res.text();
+  return template;
+}
+
+export async function loadHeaderFooter() {
+  const headerTemplate = await loadTemplate("/partials/header.html");
+  const footerTemplate = await loadTemplate("/partials/footer.html");
+
+  const headerElem = document.querySelector("#main-header");
+  const footerElem = document.querySelector("#main-footer");
+
+  if (headerElem) headerElem.innerHTML = headerTemplate;
+  if (footerElem) footerElem.innerHTML = footerTemplate;
 }
