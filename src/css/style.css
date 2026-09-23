@@ -326,3 +326,30 @@ footer {
   margin: 0;
   font-size: 1.1rem;
 }
+
+/* Week 04 Custom Alert Styling */
+.alert {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+  padding: 0.75rem 1.25rem;
+  margin-bottom: 1rem;
+  border-radius: 4px;
+}
+
+.alert p {
+  margin: 0;
+}
+
+.alert span {
+  cursor: pointer;
+  font-weight: bold;
+  padding: 0 0.5rem;
+}
+
+.alert span:hover {
+  color: #000;
+}
