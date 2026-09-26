@@ -1,5 +1,5 @@
-import { getLocalStorage, setLocalStorage, alertMessage, removeAllAlerts } from "./utils.mjs";
-import ExternalServices from "./ExternalServices.mjs";
+import { getLocalStorage, setLocalStorage, alertMessage, removeAllAlerts } from './utils.mjs';
+import ExternalServices from './ExternalServices.mjs';
 
 const services = new ExternalServices();
 
@@ -27,7 +27,6 @@ export default class CheckoutProcess {
     this.outputSelector = outputSelector;
     this.list = [];
     this.itemTotal = 0;
-    this.itemCount = 0;
     this.shipping = 0;
     this.tax = 0;
     this.orderTotal = 0;
@@ -39,45 +38,39 @@ export default class CheckoutProcess {
   }
 
   calculateItemSubTotal() {
-    this.itemTotal = this.list.reduce(
-      (sum, item) => sum + item.FinalPrice * (item.Quantity || 1),
-      0
-    );
-    this.itemCount = this.list.reduce(
-      (sum, item) => sum + (item.Quantity || 1),
-      0
-    );
+    const totalQuantity = this.list.reduce((sum, item) => sum + (item.Quantity || 1), 0);
+    this.itemTotal = this.list.reduce((sum, item) => sum + (item.FinalPrice * (item.Quantity || 1)), 0);
 
-    const subtotalElem = document.querySelector(`${this.outputSelector} #subtotal`);
-    if (subtotalElem) {
-      subtotalElem.innerText = `$${this.itemTotal.toFixed(2)}`;
-    }
+    const countElement = document.querySelector(`${this.outputSelector} #num-items`);
+    const subtotalElement = document.querySelector(`${this.outputSelector} #subtotal`);
+
+    if (countElement) countElement.innerText = totalQuantity;
+    if (subtotalElement) subtotalElement.innerText = `$${this.itemTotal.toFixed(2)}`;
   }
 
   calculateOrderTotal() {
-    if (this.itemCount > 0) {
-      this.shipping = 10 + (this.itemCount - 1) * 2;
-    } else {
-      this.shipping = 0;
-    }
+    const totalCount = this.list.reduce((sum, item) => sum + (item.Quantity || 1), 0);
+
     this.tax = this.itemTotal * 0.06;
-    this.orderTotal = this.itemTotal + this.shipping + this.tax;
+    this.shipping = totalCount > 0 ? 10 + (totalCount - 1) * 2 : 0;
+    this.orderTotal = this.itemTotal + this.tax + this.shipping;
 
     this.displayOrderTotals();
   }
 
   displayOrderTotals() {
-    const shippingElem = document.querySelector(`${this.outputSelector} #shipping`);
-    const taxElem = document.querySelector(`${this.outputSelector} #tax`);
-    const totalElem = document.querySelector(`${this.outputSelector} #orderTotal`);
+    const taxEl = document.querySelector(`${this.outputSelector} #tax`);
+    const shippingEl = document.querySelector(`${this.outputSelector} #shipping`);
+    const orderTotalEl = document.querySelector(`${this.outputSelector} #orderTotal`);
 
-    if (shippingElem) shippingElem.innerText = `$${this.shipping.toFixed(2)}`;
-    if (taxElem) taxElem.innerText = `$${this.tax.toFixed(2)}`;
-    if (totalElem) totalElem.innerText = `$${this.orderTotal.toFixed(2)}`;
+    if (taxEl) taxEl.innerText = `$${this.tax.toFixed(2)}`;
+    if (shippingEl) shippingEl.innerText = `$${this.shipping.toFixed(2)}`;
+    if (orderTotalEl) orderTotalEl.innerText = `$${this.orderTotal.toFixed(2)}`;
   }
 
   async checkout(form) {
     const jsonPayload = formDataToJSON(form);
+
     jsonPayload.orderDate = new Date().toISOString();
     jsonPayload.orderTotal = this.orderTotal.toFixed(2);
     jsonPayload.tax = this.tax.toFixed(2);
@@ -85,18 +78,17 @@ export default class CheckoutProcess {
     jsonPayload.items = packageItems(this.list);
 
     try {
-      const res = await services.checkout(jsonPayload);
+      await services.checkout(jsonPayload);
       setLocalStorage(this.key, []);
-      location.assign("/cart/success.html");
-      return res;
+      window.location.href = './success.html';
     } catch (err) {
       removeAllAlerts();
-      if (err.name === "servicesError" && typeof err.message === "object") {
+      if (err.message && typeof err.message === 'object') {
         for (const key in err.message) {
-          alertMessage(err.message[key]);
+          alertMessage(`${key}: ${err.message[key]}`);
         }
       } else {
-        alertMessage(err.message || "An error occurred during checkout.");
+        alertMessage('Order failed. Please check your card details and try again.');
       }
     }
   }
