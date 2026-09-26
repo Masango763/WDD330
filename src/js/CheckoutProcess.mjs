@@ -85,10 +85,10 @@ export default class CheckoutProcess {
       removeAllAlerts();
       if (err.message && typeof err.message === 'object') {
         for (const key in err.message) {
-          alertMessage(`${key}: ${err.message[key]}`);
+          alertMessage(err.message[key]);
         }
       } else {
-        alertMessage('Order failed. Please check your card details and try again.');
+        alertMessage(err.message || 'Order failed. Please check your card details.');
       }
     }
   }

@@ -353,3 +353,25 @@ footer {
 .alert span:hover {
   color: #000;
 }
+
+.alert-banner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #f4a261;
+  color: #000;
+  padding: 12px 16px;
+  margin-bottom: 8px;
+  border: 1px solid #e76f51;
+  font-weight: 500;
+}
+
+.alert-banner .alert-close {
+  cursor: pointer;
+  font-weight: bold;
+  padding: 0 4px;
+}
+
+.alert-banner .alert-close:hover {
+  color: #d62828;
+}

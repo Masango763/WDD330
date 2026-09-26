@@ -9,7 +9,7 @@ document.querySelector('#zip').addEventListener('blur', () => {
 
 document.querySelector('#checkoutSubmit').addEventListener('click', (e) => {
   e.preventDefault();
-  const form = document.forms['checkout-form'];
+  const form = document.forms['checkout-form'] || document.forms[0];
   const isValid = form.checkValidity();
   form.reportValidity();
 

@@ -72,3 +72,29 @@ export function removeAllAlerts() {
   const alerts = document.querySelectorAll('.alert-banner');
   alerts.forEach((alert) => alert.remove());
 }
+
+export function alertMessage(message, scroll = true) {
+  const alert = document.createElement('div');
+  alert.classList.add('alert-banner');
+  alert.innerHTML = `<span>${message}</span><span class="alert-close">X</span>`;
+
+  alert.addEventListener('click', function (e) {
+    if (e.target.classList.contains('alert-close')) {
+      this.remove();
+    }
+  });
+
+  const main = document.querySelector('main');
+  if (main) {
+    main.prepend(alert);
+  }
+
+  if (scroll) {
+    window.scrollTo(0, 0);
+  }
+}
+
+export function removeAllAlerts() {
+  const alerts = document.querySelectorAll('.alert-banner');
+  alerts.forEach((alert) => alert.remove());
+}
