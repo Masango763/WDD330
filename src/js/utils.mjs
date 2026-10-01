@@ -50,3 +50,67 @@ export async function loadHeaderFooter() {
   if (headerElem) headerElem.innerHTML = headerTemplate;
   if (footerElem) footerElem.innerHTML = footerTemplate;
 }
+
+export function alertMessage(message, scroll = true) {
+  const alert = document.createElement('div');
+  alert.classList.add('alert-banner');
+  alert.innerHTML = `<span>${message}</span><span class="alert-close">X</span>`;
+
+  alert.querySelector('.alert-close').addEventListener('click', () => {
+    alert.remove();
+  });
+
+  const main = document.querySelector('main');
+  main.prepend(alert);
+
+  if (scroll) {
+    window.scrollTo(0, 0);
+  }
+}
+
+export function removeAllAlerts() {
+  const alerts = document.querySelectorAll('.alert-banner');
+  alerts.forEach((alert) => alert.remove());
+}
+
+export function alertMessage(message, scroll = true) {
+  const alert = document.createElement('div');
+  alert.classList.add('alert-banner');
+  alert.innerHTML = `<span>${message}</span><span class="alert-close">X</span>`;
+
+  alert.addEventListener('click', function (e) {
+    if (e.target.classList.contains('alert-close')) {
+      this.remove();
+    }
+  });
+
+  const main = document.querySelector('main');
+  if (main) {
+    main.prepend(alert);
+  }
+
+  if (scroll) {
+    window.scrollTo(0, 0);
+  }
+}
+
+export function removeAllAlerts() {
+  const alerts = document.querySelectorAll('.alert-banner');
+  alerts.forEach((alert) => alert.remove());
+}
+
+// Cart Icon Quantity Badge Indicator
+export function updateCartBadge() {
+  const cartItems = JSON.parse(localStorage.getItem("so-cart")) || [];
+  const totalQuantity = cartItems.reduce((sum, item) => sum + (item.Quantity || 1), 0);
+  const badge = document.querySelector(".cart-badge");
+
+  if (badge) {
+    if (totalQuantity > 0) {
+      badge.textContent = totalQuantity;
+      badge.style.display = "inline-block";
+    } else {
+      badge.style.display = "none";
+    }
+  }
+}
