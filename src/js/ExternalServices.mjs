@@ -27,9 +27,18 @@ export default class ExternalServices {
       const data = await convertToJson(response);
       return data.Result || data;
     } catch (error) {
-      const res = await fetch("/json/tents.json");
-      const data = await convertToJson(res);
-      return data.find((item) => item.Id === id);
+      const categories = ["tents", "backpacks", "sleeping-bags", "hammocks"];
+      for (const cat of categories) {
+        try {
+          const res = await fetch(`/json/${cat}.json`);
+          if (res.ok) {
+            const list = await res.json();
+            const found = list.find((item) => item.Id === id);
+            if (found) return found;
+          }
+        } catch (e) {}
+      }
+      return {};
     }
   }
 }

@@ -1,18 +1,25 @@
 import { getLocalStorage, setLocalStorage, updateCartBadge, alertMessage } from "./utils.mjs";
 
 function productDetailsTemplate(product) {
+  const brandName = product.Brand ? product.Brand.Name : "";
+  const name = product.NameWithoutBrand || product.Name || "";
+  const imgSrc = product.Images ? product.Images.PrimaryLarge : product.Image || "";
+  const price = product.FinalPrice || product.ListPrice || "0.00";
+  const color = product.Colors && product.Colors[0] ? product.Colors[0].ColorName : "";
+  const desc = product.DescriptionHtmlSimple || product.Description || "";
+
   return `<section class="product-detail">
-    <h3>${product.Brand ? product.Brand.Name : ""}</h3>
-    <h2 class="divider">${product.NameWithoutBrand || product.Name}</h2>
+    <h3>${brandName}</h3>
+    <h2 class="divider">${name}</h2>
     <img
       class="divider"
-      src="${product.Images ? product.Images.PrimaryLarge : ""}"
-      alt="${product.NameWithoutBrand || product.Name}"
+      src="${imgSrc}"
+      alt="${name}"
     />
-    <p class="product-card__price">$${product.FinalPrice}</p>
-    <p class="product__color">${product.Colors && product.Colors[0] ? product.Colors[0].ColorName : ""}</p>
+    <p class="product-card__price">$${price}</p>
+    <p class="product__color">${color}</p>
     <p class="product__description">
-      ${product.DescriptionHtmlSimple}
+      ${desc}
     </p>
     <div class="product-detail__add">
       <button id="addToCart" data-id="${product.Id}">Add to Cart</button>
@@ -51,13 +58,13 @@ export default class ProductDetails {
 
     setLocalStorage("so-cart", cart);
     updateCartBadge();
-    alertMessage(`${this.product.NameWithoutBrand || this.product.Name} added to cart!`);
+    alertMessage(`${this.product.NameWithoutBrand || this.product.Name || "Item"} added to cart!`);
   }
 
   renderProductDetails(selector) {
     const element = document.querySelector(selector);
     if (element) {
-      element.insertAdjacentHTML("afterbegin", productDetailsTemplate(this.product));
+      element.innerHTML = productDetailsTemplate(this.product);
     }
   }
 }
