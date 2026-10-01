@@ -98,3 +98,19 @@ export function removeAllAlerts() {
   const alerts = document.querySelectorAll('.alert-banner');
   alerts.forEach((alert) => alert.remove());
 }
+
+// Cart Icon Quantity Badge Indicator
+export function updateCartBadge() {
+  const cartItems = JSON.parse(localStorage.getItem("so-cart")) || [];
+  const totalQuantity = cartItems.reduce((sum, item) => sum + (item.Quantity || 1), 0);
+  const badge = document.querySelector(".cart-badge");
+
+  if (badge) {
+    if (totalQuantity > 0) {
+      badge.textContent = totalQuantity;
+      badge.style.display = "inline-block";
+    } else {
+      badge.style.display = "none";
+    }
+  }
+}
