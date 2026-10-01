@@ -1,34 +1,35 @@
-const baseURL = 'https://wdd330-backend.onrender-osp8.com/';
+const baseURL = import.meta.env.VITE_SERVER_URL || "https://wdd330-backend.onrender.com/";
 
-async function convertToJson(res) {
-  const jsonResponse = await res.json();
+function convertToJson(res) {
   if (res.ok) {
-    return jsonResponse;
+    return res.json();
   } else {
-    throw { name: 'servicesError', message: jsonResponse };
+    throw new Error("Bad Response");
   }
 }
 
 export default class ExternalServices {
   async getData(category) {
-    const response = await fetch(`${baseURL}products/search/${category}`);
-    return await convertToJson(response);
+    try {
+      const response = await fetch(`${baseURL}products/search/${category}`);
+      const data = await convertToJson(response);
+      return data.Result || data;
+    } catch (error) {
+      const res = await fetch(`/json/${category}.json`);
+      const data = await convertToJson(res);
+      return data;
+    }
   }
 
   async findProductById(id) {
-    const response = await fetch(`${baseURL}product/${id}`);
-    return await convertToJson(response);
-  }
-
-  async checkout(payload) {
-    const options = {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(payload)
-    };
-    const response = await fetch(`${baseURL}checkout`, options);
-    return await convertToJson(response);
+    try {
+      const response = await fetch(`${baseURL}product/${id}`);
+      const data = await convertToJson(response);
+      return data.Result || data;
+    } catch (error) {
+      const res = await fetch("/json/tents.json");
+      const data = await convertToJson(res);
+      return data.find((item) => item.Id === id);
+    }
   }
 }
