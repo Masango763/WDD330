@@ -1,22 +1,13 @@
-import { getLocalStorage, setLocalStorage, alertMessage, removeAllAlerts } from './utils.mjs';
-import ExternalServices from './ExternalServices.mjs';
+import { getLocalStorage, setLocalStorage, alertMessage, removeAllAlerts } from "./utils.mjs";
+import ExternalServices from "./ExternalServices.mjs";
 
 const services = new ExternalServices();
-
-function formDataToJSON(formElement) {
-  const formData = new FormData(formElement);
-  const convertedJSON = {};
-  formData.forEach((value, key) => {
-    convertedJSON[key] = value;
-  });
-  return convertedJSON;
-}
 
 function packageItems(items) {
   return items.map((item) => ({
     id: item.Id,
-    name: item.Name,
-    price: item.FinalPrice,
+    price: item.FinalPrice || item.ListPrice,
+    name: item.NameWithoutBrand || item.Name,
     quantity: item.Quantity || 1
   }));
 }
@@ -34,62 +25,77 @@ export default class CheckoutProcess {
 
   init() {
     this.list = getLocalStorage(this.key) || [];
-    this.calculateItemSubTotal();
+    this.calculateItemSummary();
   }
 
-  calculateItemSubTotal() {
-    const totalQuantity = this.list.reduce((sum, item) => sum + (item.Quantity || 1), 0);
-    this.itemTotal = this.list.reduce((sum, item) => sum + (item.FinalPrice * (item.Quantity || 1)), 0);
+  calculateItemSummary() {
+    const summaryElement = document.querySelector(this.outputSelector + " #cartTotal");
+    const numItemsElement = document.querySelector(this.outputSelector + " #num-items");
 
-    const countElement = document.querySelector(`${this.outputSelector} #num-items`);
-    const subtotalElement = document.querySelector(`${this.outputSelector} #subtotal`);
+    const itemCount = this.list.reduce((sum, item) => sum + (item.Quantity || 1), 0);
+    this.itemTotal = this.list.reduce(
+      (sum, item) => sum + (item.FinalPrice || item.ListPrice || 0) * (item.Quantity || 1),
+      0
+    );
 
-    if (countElement) countElement.innerText = totalQuantity;
-    if (subtotalElement) subtotalElement.innerText = `$${this.itemTotal.toFixed(2)}`;
+    if (numItemsElement) numItemsElement.innerText = itemCount;
+    if (summaryElement) summaryElement.innerText = `$${this.itemTotal.toFixed(2)}`;
+
+    this.calculateOrdertotals();
   }
 
-  calculateOrderTotal() {
-    const totalCount = this.list.reduce((sum, item) => sum + (item.Quantity || 1), 0);
+  calculateOrdertotals() {
+    const itemCount = this.list.reduce((sum, item) => sum + (item.Quantity || 1), 0);
 
-    this.tax = this.itemTotal * 0.06;
-    this.shipping = totalCount > 0 ? 10 + (totalCount - 1) * 2 : 0;
-    this.orderTotal = this.itemTotal + this.tax + this.shipping;
+    if (itemCount > 0) {
+      this.shipping = 10 + (itemCount - 1) * 2;
+      this.tax = this.itemTotal * 0.06;
+      this.orderTotal = this.itemTotal + this.shipping + this.tax;
+    } else {
+      this.shipping = 0;
+      this.tax = 0;
+      this.orderTotal = 0;
+    }
 
     this.displayOrderTotals();
   }
 
   displayOrderTotals() {
-    const taxEl = document.querySelector(`${this.outputSelector} #tax`);
-    const shippingEl = document.querySelector(`${this.outputSelector} #shipping`);
-    const orderTotalEl = document.querySelector(`${this.outputSelector} #orderTotal`);
+    const shipping = document.querySelector(this.outputSelector + " #shipping");
+    const tax = document.querySelector(this.outputSelector + " #tax");
+    const orderTotal = document.querySelector(this.outputSelector + " #orderTotal");
 
-    if (taxEl) taxEl.innerText = `$${this.tax.toFixed(2)}`;
-    if (shippingEl) shippingEl.innerText = `$${this.shipping.toFixed(2)}`;
-    if (orderTotalEl) orderTotalEl.innerText = `$${this.orderTotal.toFixed(2)}`;
+    if (shipping) shipping.innerText = `$${this.shipping.toFixed(2)}`;
+    if (tax) tax.innerText = `$${this.tax.toFixed(2)}`;
+    if (orderTotal) orderTotal.innerText = `$${this.orderTotal.toFixed(2)}`;
   }
 
   async checkout(form) {
-    const jsonPayload = formDataToJSON(form);
-
-    jsonPayload.orderDate = new Date().toISOString();
-    jsonPayload.orderTotal = this.orderTotal.toFixed(2);
-    jsonPayload.tax = this.tax.toFixed(2);
-    jsonPayload.shipping = this.shipping;
-    jsonPayload.items = packageItems(this.list);
+    const json = formDataToJSON(form);
+    json.orderDate = new Date();
+    json.orderTotal = this.orderTotal.toFixed(2);
+    json.tax = this.tax.toFixed(2);
+    json.shipping = this.shipping.toFixed(2);
+    json.items = packageItems(this.list);
 
     try {
-      await services.checkout(jsonPayload);
-      setLocalStorage(this.key, []);
-      window.location.href = './success.html';
+      const res = await services.checkout(json);
+      setLocalStorage("so-cart", []);
+      location.assign("/cart/success.html");
     } catch (err) {
       removeAllAlerts();
-      if (err.message && typeof err.message === 'object') {
-        for (const key in err.message) {
-          alertMessage(err.message[key]);
-        }
-      } else {
-        alertMessage(err.message || 'Order failed. Please check your card details.');
+      for (let message in err.message) {
+        alertMessage(err.message[message]);
       }
     }
   }
+}
+
+function formDataToJSON(formElement) {
+  const formData = new FormData(formElement);
+  const convertedJSON = {};
+  formData.forEach((value, key) => {
+    convertedJSON[key] = value;
+  });
+  return convertedJSON;
 }
