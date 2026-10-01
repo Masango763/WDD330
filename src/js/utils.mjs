@@ -1,37 +1,51 @@
+// wrapper for querySelector
+export function qs(selector, parent = document) {
+  return parent.querySelector(selector);
+}
+
+// retrieve data from localstorage
 export function getLocalStorage(key) {
   return JSON.parse(localStorage.getItem(key));
 }
 
+// save data to local storage
 export function setLocalStorage(key, data) {
   localStorage.setItem(key, JSON.stringify(data));
 }
 
-export function alertMessage(message, scroll = true) {
-  const alert = document.createElement("div");
-  alert.classList.add("alert");
-  alert.innerHTML = `<p>${message}</p><span>X</span>`;
-
-  alert.addEventListener("click", function (e) {
-    if (e.target.tagName === "SPAN") {
-      const main = document.querySelector("main");
-      if (main && main.contains(this)) {
-        main.removeChild(this);
-      }
-    }
-  });
-
-  const main = document.querySelector("main");
-  if (main) {
-    main.prepend(alert);
-  }
-  if (scroll) {
-    window.scrollTo(0, 0);
+// set a listener for onclick/ontouch
+export function setClick(selector, callback) {
+  const el = qs(selector);
+  if (el) {
+    el.addEventListener("touchend", (event) => {
+      event.preventDefault();
+      callback();
+    });
+    el.addEventListener("click", callback);
   }
 }
 
-export function removeAllAlerts() {
-  const alerts = document.querySelectorAll(".alert");
-  alerts.forEach((alert) => alert.remove());
+export function getParam(param) {
+  const queryString = window.location.search;
+  const urlParams = new URLSearchParams(queryString);
+  return urlParams.get(param);
+}
+
+export function renderListWithTemplate(templateFn, parentElement, list, position = "afterbegin", clear = false) {
+  if (clear) {
+    parentElement.innerHTML = "";
+  }
+  const htmlStrings = list.map(templateFn);
+  parentElement.insertAdjacentHTML(position, htmlStrings.join(""));
+}
+
+export function renderWithTemplate(template, parentElement, data, callback) {
+  if (parentElement) {
+    parentElement.insertAdjacentHTML("afterbegin", template);
+    if (callback) {
+      callback(data);
+    }
+  }
 }
 
 export async function loadTemplate(path) {
@@ -41,50 +55,26 @@ export async function loadTemplate(path) {
 }
 
 export async function loadHeaderFooter() {
-  const headerTemplate = await loadTemplate("/partials/header.html");
-  const footerTemplate = await loadTemplate("/partials/footer.html");
+  const headerTemplate = await loadTemplate("../partials/header.html");
+  const footerTemplate = await loadTemplate("../partials/footer.html");
+  const headerElement = document.querySelector("#main-header");
+  const footerElement = document.querySelector("#main-footer");
 
-  const headerElem = document.querySelector("#main-header");
-  const footerElem = document.querySelector("#main-footer");
-
-  if (headerElem) headerElem.innerHTML = headerTemplate;
-  if (footerElem) footerElem.innerHTML = footerTemplate;
+  renderWithTemplate(headerTemplate, headerElement);
+  renderWithTemplate(footerTemplate, footerElement);
+  updateCartBadge();
 }
 
 export function alertMessage(message, scroll = true) {
-  const alert = document.createElement('div');
-  alert.classList.add('alert-banner');
-  alert.innerHTML = `<span>${message}</span><span class="alert-close">X</span>`;
+  const alert = document.createElement("div");
+  alert.classList.add("alert-banner");
+  alert.innerHTML = `<p>${message}</p><span>X</span>`;
 
-  alert.querySelector('.alert-close').addEventListener('click', () => {
+  alert.querySelector("span").addEventListener("click", () => {
     alert.remove();
   });
 
-  const main = document.querySelector('main');
-  main.prepend(alert);
-
-  if (scroll) {
-    window.scrollTo(0, 0);
-  }
-}
-
-export function removeAllAlerts() {
-  const alerts = document.querySelectorAll('.alert-banner');
-  alerts.forEach((alert) => alert.remove());
-}
-
-export function alertMessage(message, scroll = true) {
-  const alert = document.createElement('div');
-  alert.classList.add('alert-banner');
-  alert.innerHTML = `<span>${message}</span><span class="alert-close">X</span>`;
-
-  alert.addEventListener('click', function (e) {
-    if (e.target.classList.contains('alert-close')) {
-      this.remove();
-    }
-  });
-
-  const main = document.querySelector('main');
+  const main = document.querySelector("main");
   if (main) {
     main.prepend(alert);
   }
@@ -95,14 +85,15 @@ export function alertMessage(message, scroll = true) {
 }
 
 export function removeAllAlerts() {
-  const alerts = document.querySelectorAll('.alert-banner');
+  const alerts = document.querySelectorAll(".alert-banner");
   alerts.forEach((alert) => alert.remove());
 }
 
-// Cart Icon Quantity Badge Indicator
 export function updateCartBadge() {
-  const cartItems = JSON.parse(localStorage.getItem("so-cart")) || [];
-  const totalQuantity = cartItems.reduce((sum, item) => sum + (item.Quantity || 1), 0);
+  const cartItems = getLocalStorage("so-cart") || [];
+  const totalQuantity = Array.isArray(cartItems)
+    ? cartItems.reduce((sum, item) => sum + (item.Quantity || 1), 0)
+    : 0;
   const badge = document.querySelector(".cart-badge");
 
   if (badge) {
