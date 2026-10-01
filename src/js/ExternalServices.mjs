@@ -1,10 +1,11 @@
 const baseURL = import.meta.env.VITE_SERVER_URL || "https://wdd330-backend.onrender.com/";
 
-function convertToJson(res) {
+async function convertToJson(res) {
+  const data = await res.json();
   if (res.ok) {
-    return res.json();
+    return data;
   } else {
-    throw new Error("Bad Response");
+    throw { name: "servicesError", message: data };
   }
 }
 
@@ -16,8 +17,7 @@ export default class ExternalServices {
       return data.Result || data;
     } catch (error) {
       const res = await fetch(`/json/${category}.json`);
-      const data = await convertToJson(res);
-      return data;
+      return await res.json();
     }
   }
 
@@ -40,5 +40,17 @@ export default class ExternalServices {
       }
       return {};
     }
+  }
+
+  async checkout(payload) {
+    const options = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(payload)
+    };
+    const response = await fetch(`${baseURL}checkout/`, options);
+    return await convertToJson(response);
   }
 }
