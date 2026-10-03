@@ -1,0 +1,26 @@
+[
+  {
+    "id": "soil-management",
+    "title": "Conservation Agriculture & Soil Health",
+    "category": "Soil Management",
+    "description": "Practices to preserve soil moisture, reduce erosion, and enhance organic matter.",
+    "keyPoints": [
+      "Minimum soil disturbance (ripping instead of deep ploughing)",
+      "Permanent organic soil cover using crop residues",
+      "Crop rotation with nitrogen-fixing legumes"
+    ],
+    "topic": "soil"
+  },
+  {
+    "id": "water-conservation",
+    "title": "Rainwater Harvesting & Irrigation Efficiency",
+    "category": "Water Conservation",
+    "description": "Techniques for capturing and storing rainwater during dry spells.",
+    "keyPoints": [
+      "Constructing infiltration pits and tied ridges",
+      "Using mulching to drastically reduce soil evaporation",
+      "Scheduling irrigation during cooler morning or evening hours"
+    ],
+    "topic": "water"
+  }
+]

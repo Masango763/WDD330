@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Crop Directory - AgriPulse Zimbabwe</title>
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/responsive.css">
+  <link rel="icon" type="image/svg+xml" href="images/icon.svg">
+</head>
+<body>
+  <header>
+    <div class="logo-area">
+      <a href="index.html">
+        <img src="images/logo.svg" alt="AgriPulse Zimbabwe Logo">
+      </a>
+    </div>
+    <nav>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="weather.html">Weather</a></li>
+        <li><a href="crops.html" class="active">Crops</a></li>
+        <li><a href="resources.html">Resources</a></li>
+        <li><a href="about.html">About</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <h2>Crop Directory</h2>
+    <div class="search-box">
+      <input type="text" id="crop-search" placeholder="Search crops...">
+      <button class="btn">Search</button>
+    </div>
+
+    <div style="display: flex; gap: 2rem; margin-top: 1.5rem;">
+      <aside style="width: 250px;" class="card">
+        <h3>FILTERS</h3>
+        <h4>Growing season</h4>
+        <label><input type="checkbox" value="Summer"> Summer</label><br>
+        <label><input type="checkbox" value="Winter"> Winter</label>
+        
+        <h4 style="margin-top: 1rem;">Soil type</h4>
+        <label><input type="checkbox" value="Sandy loam"> Sandy loam</label><br>
+        <label><input type="checkbox" value="Clay loam"> Clay loam</label>
+
+        <h4 style="margin-top: 1rem;">Water need</h4>
+        <label><input type="checkbox" value="Low"> Low</label><br>
+        <label><input type="checkbox" value="Medium"> Medium</label><br>
+        <label><input type="checkbox" value="High"> High</label>
+      </aside>
+
+      <section style="flex: 1;">
+        <p id="crop-count">5 crops cataloged</p>
+        <div id="crop-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; margin-top: 1rem;">
+            <h3>Maize</h3>
+            <p><strong>Season:</strong> Summer | <strong>Soil:</strong> Sandy loam</p>
+            <p style="margin-top: 0.5rem; font-size: 0.9rem;">Staple cereal crop across Zimbabwe, highly responsive to summer rains and Pfumvudza conservation agriculture.</p>
+          <div class="card">
+            <h3>Soybeans</h3>
+            <p><strong>Season:</strong> Summer | <strong>Soil:</strong> Clay loam</p>
+            <p style="margin-top: 0.5rem; font-size: 0.9rem;">Important oilseed crop thriving in high rainfall regions like Mashonaland.</p>
+          <div class="card">
+            <h3>Wheat</h3>
+            <p><strong>Season:</strong> Winter | <strong>Soil:</strong> Clay loam</p>
+          </div>
+          <div class="card">
+            <h3>Sorghum</h3>
+            <p><strong>Season:</strong> Summer | <strong>Soil:</strong> Sandy loam</p>
+          </div>
+          <div class="card">
+            <h3>Groundnuts</h3>
+            <p><strong>Season:</strong> Summer | <strong>Soil:</strong> Sandy loam</p>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer>
+    <p>&copy; 2026 AgriPulse Zimbabwe</p>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AgriPulse Zimbabwe - Smart Agriculture & Weather Telemetry</title>
+  <link rel="stylesheet" href="css/layout.css">
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+</head>
+<body>
+  <header>
+    <div class="logo-area">
+      <a href="index.html">
+        <img src="images/logo.svg" alt="AgriPulse Zimbabwe Logo">
+      </a>
+    </div>
+    <nav>
+      <ul>
+        <li><a href="index.html" class="active">Home</a></li>
+        <li><a href="weather.html">Weather</a></li>
+        <li><a href="crops.html">Crops</a></li>
+        <li><a href="resources.html">Resources</a></li>
+        <li><a href="about.html">About</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <!-- Hero / Search Section -->
+    <section class="card" style="background: #ffffff; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); margin-bottom: 1.5rem;">
+      <h1 style="color: #1B4332; margin-bottom: 0.5rem; font-size: 1.8rem;">SMART AGRICULTURE INFORMATION FOR ZIMBABWE</h1>
+      <p style="color: #666; margin-bottom: 1.5rem;">Real-time weather telemetry, agricultural mapping, and crop advisory.</p>
+      <div style="display: flex; gap: 0.5rem; max-width: 600px;">
+        <input type="text" id="search-input" placeholder="Search location in Zimbabwe (e.g., Harare, Bulawayo...)" style="flex: 1; padding: 0.75rem; border: 1px solid #ccc; border-radius: 4px; font-size: 1rem;">
+        <button id="search-btn" style="background: #2D6A4F; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 4px; font-weight: bold; cursor: pointer;">Search</button>
+      </div>
+    </section>
+
+    <!-- Live Weather Telemetry Section -->
+    <section class="card" style="background: #ffffff; padding: 1.5rem 2rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); margin-bottom: 1.5rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+        <div>
+          <h2 style="color: #1B4332; margin: 0; font-size: 1.4rem;">LIVE WEATHER TELEMETRY</h2>
+          <span style="background: #D8F3DC; color: #1B4332; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.85rem; font-weight: bold; display: inline-flex; align-items: center; gap: 5px; margin-top: 5px;">
+            <span style="width: 8px; height: 8px; background: #2D6A4F; border-radius: 50%;"></span> Live API
+          </span>
+        </div>
+        <div>
+          <h3 id="location-title" style="color: #1B4332; margin: 0; font-size: 1.5rem;">Harare, Zimbabwe</h3>
+          <p id="weather-time" style="color: #666; font-size: 0.85rem; margin: 2px 0 0 0;">Fetching live Open-Meteo telemetry...</p>
+        </div>
+      </div>
+      
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-top: 1.5rem;">
+        <div style="background: #F4F9F4; padding: 1rem; border-radius: 6px; border-left: 4px solid #2D6A4F;">
+          <div style="font-size: 0.85rem; color: #555;">Current Temperature</div>
+          <div id="current-temp" style="font-size: 1.8rem; font-weight: bold; color: #1B4332;">--°C</div>
+          <div id="weather-desc" style="font-size: 0.9rem; color: #2D6A4F; margin-top: 4px;">Loading conditions...</div>
+        </div>
+        <div style="background: #F4F9F4; padding: 1rem; border-radius: 6px; border-left: 4px solid #52B788;">
+          <div style="font-size: 0.85rem; color: #555;">Atmospheric & Wind</div>
+          <div id="weather-details" style="font-size: 1rem; font-weight: 600; color: #1B4332; margin-top: 8px;">Humidity: --% | Wind: -- km/h</div>
+        </div>
+        <div style="background: #F4F9F4; padding: 1rem; border-radius: 6px; border-left: 4px solid #E9C46A;">
+          <div style="font-size: 0.85rem; color: #555;">Crop Suitability Status</div>
+          <div id="crop-check-status" style="font-size: 0.9rem; font-weight: 600; color: #1B4332; margin-top: 4px;">Analyzing local weather conditions...</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Dashboard Grid: Map & Forecast -->
+    <div class="dashboard-grid">
+      <!-- Real-Time Map Section -->
+      <section class="card" style="background: #ffffff; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+        <h2 style="color: #1B4332; font-size: 1.2rem; margin-bottom: 0.5rem;">ZIMBABWE REAL-TIME MAP</h2>
+        <p style="color: #666; font-size: 0.9rem; margin-bottom: 1rem;">Click agricultural hubs to load live telemetry and regional data.</p>
+        <div id="map" style="width: 100%; height: 420px; border-radius: 6px; border: 1px solid #ddd; z-index: 1;"></div>
+      </section>
+
+      <!-- 7-Day Forecast Section -->
+      <section class="card" style="background: #ffffff; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+        <h2 style="color: #1B4332; font-size: 1.2rem; margin-bottom: 0.5rem;">7-DAY FORECAST</h2>
+        <p style="color: #666; font-size: 0.9rem; margin-bottom: 1rem;">Extended outlook for agricultural planning.</p>
+        <div id="forecast-container" style="display: flex; flex-direction: column; gap: 0.5rem;">
+          <div style="color: #666; font-size: 0.9rem;">Loading forecast data...</div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer>
+    <p>&copy; 2026 AgriPulse Zimbabwe. Empowering farmers with real-time intelligence and climate resilience.</p>
+  </footer>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <!-- Main Application Script -->
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
